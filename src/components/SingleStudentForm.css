@@ -109,6 +109,21 @@ td:last-child {
   width: 100px;
 }
 
+/* Make result inputs narrower */
+.result-input {
+  width: 45px;  /* Enough for 2 digits plus some padding */
+  text-align: center;
+}
+
+/* Style for multi-line column headers */
+th.result-header {
+  text-align: center;
+  white-space: normal;  /* Allow text to wrap */
+  width: 45px;         /* Match input width */
+  line-height: 1.2;    /* Tighter line spacing */
+  padding: 8px 4px;    /* Reduced horizontal padding */
+}
+
 /* Ensure scaled scores appear above chart */
 .scaled-score {
   position: relative;
@@ -155,14 +170,6 @@ table th:last-child {
   display: flex;
   align-items: center;
   gap: 4px;
-}
-
-.result-input {
-  width: 80px;
-  padding: 4px 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
 }
 
 .button-stack {

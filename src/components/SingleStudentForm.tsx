@@ -736,17 +736,11 @@ export function SingleStudentForm() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Subject</th>
-                      {rangeMode ? (
-                        <>
-                          <th>Lower Result</th>
-                          <th>Result</th>
-                          <th>Upper Result</th>
-                        </>
-                      ) : (
-                        <th>Result</th>
-                      )}
-                      <th>Scaled</th>
+                      <th>SUBJECT</th>
+                      <th className="result-header">LOWER{'\n'}RESULT</th>
+                      <th className="result-header">RESULT</th>
+                      <th className="result-header">UPPER{'\n'}RESULT</th>
+                      <th>SCALED</th>
                     </tr>
                   </thead>
                   <tbody>
