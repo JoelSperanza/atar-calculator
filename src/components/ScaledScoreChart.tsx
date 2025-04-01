@@ -1,6 +1,5 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { getScaledScore } from '../utils/calculations';
 import './ScaledScoreChart.css';
 
 interface SubjectEntry {
@@ -23,9 +22,10 @@ interface ChartDataPoint {
 interface ScaledScoreChartProps {
   entries: SubjectEntry[];
   rangeMode: boolean;
+  getScaledScore: (subject: string, result: string, scale: number) => number;
 }
 
-export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, rangeMode }) => {
+export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, rangeMode, getScaledScore }) => {
   // Sort entries by result score (converting to numbers for comparison)
   const sortedEntries = [...entries].sort((a, b) => {
     const aNum = parseFloat(a.result) || 0;
@@ -44,7 +44,7 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
       start: Math.min(lowerScore, currentScore),
       middle: Math.abs(currentScore - lowerScore),
       upper: Math.max(0, upperScore - currentScore),
-      fullScore: currentScore // For non-range mode
+      fullScore: currentScore
     };
   });
 

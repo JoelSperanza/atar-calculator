@@ -971,6 +971,7 @@ export function SingleStudentForm() {
               <ScaledScoreChart 
                 entries={entries.filter(entry => entry.subject && entry.scaledScore !== undefined)}
                 rangeMode={rangeMode}
+                getScaledScore={getScaledScore}
               />
 
               <ResultsDisplay 
