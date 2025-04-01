@@ -45,11 +45,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, rangeMode, getScaledScore }) => {
-  // Sort entries by result score
+  // Sort entries by scaled score instead of result
   const sortedEntries = [...entries].sort((a, b) => {
-    const aNum = parseFloat(a.result) || 0;
-    const bNum = parseFloat(b.result) || 0;
-    return bNum - aNum;
+    const aScore = a.scaledScore || 0;
+    const bScore = b.scaledScore || 0;
+    return bScore - aScore;
   });
 
   // Transform data for Recharts
@@ -105,17 +105,26 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
               <Bar 
                 dataKey="middle" 
                 stackId="a" 
-                fill="#82ca9d" 
+                fill="#82ca9d"
+                stroke="#000"
+                strokeWidth={1}
               />
               <Bar 
                 dataKey="upper" 
                 stackId="a" 
                 fill="#82ca9d" 
-                fillOpacity={0.3} 
+                fillOpacity={0.3}
+                stroke="#000"
+                strokeWidth={1}
               />
             </>
           ) : (
-            <Bar dataKey="middleValue" fill="#82ca9d" />
+            <Bar 
+              dataKey="middleValue" 
+              fill="#82ca9d"
+              stroke="#000"
+              strokeWidth={1}
+            />
           )}
         </BarChart>
       </ResponsiveContainer>
