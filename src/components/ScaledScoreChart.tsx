@@ -13,10 +13,14 @@ interface SubjectEntry {
 
 interface ChartDataPoint {
   subject: string;
-  start: number;
+  // Values for stacking
+  base: number;
   middle: number;
   upper: number;
-  fullScore: number;
+  // Actual values for tooltip
+  lowerValue: number;
+  middleValue: number;
+  upperValue: number;
 }
 
 interface ScaledScoreChartProps {
@@ -25,8 +29,23 @@ interface ScaledScoreChartProps {
   getScaledScore: (subject: string, result: string, scale: number) => number;
 }
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length > 0) {
+    const data = payload[0].payload;
+    return (
+      <div className="chart-tooltip">
+        <p className="subject">{label}</p>
+        <p className="lower">Lower Score: {data.lowerValue.toFixed(1)}</p>
+        <p className="middle">Result Score: {data.middleValue.toFixed(1)}</p>
+        <p className="upper">Upper Score: {data.upperValue.toFixed(1)}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, rangeMode, getScaledScore }) => {
-  // Sort entries by result score (converting to numbers for comparison)
+  // Sort entries by result score
   const sortedEntries = [...entries].sort((a, b) => {
     const aNum = parseFloat(a.result) || 0;
     const bNum = parseFloat(b.result) || 0;
@@ -35,16 +54,20 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
 
   // Transform data for Recharts
   const chartData: ChartDataPoint[] = sortedEntries.map(entry => {
-    const currentScore = entry.scaledScore || 0;
     const lowerScore = entry.subject ? getScaledScore(entry.subject, entry.lowerResult || '0', 0) : 0;
+    const currentScore = entry.scaledScore || 0;
     const upperScore = entry.subject ? getScaledScore(entry.subject, entry.upperResult || '0', 0) : 0;
 
     return {
       subject: entry.subject,
-      start: Math.min(lowerScore, currentScore),
-      middle: Math.abs(currentScore - lowerScore),
-      upper: Math.max(0, upperScore - currentScore),
-      fullScore: currentScore
+      // Values for stacking (relative heights)
+      base: lowerScore,
+      middle: currentScore - lowerScore,
+      upper: upperScore - currentScore,
+      // Actual values for tooltip
+      lowerValue: lowerScore,
+      middleValue: currentScore,
+      upperValue: upperScore
     };
   });
 
@@ -70,22 +93,29 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
             width={150}
             tick={{ fill: '#666' }}
           />
-          <Tooltip 
-            formatter={(value: number, name: string) => {
-              if (name === 'start') return ['Lower Score', value.toFixed(1)];
-              if (name === 'middle') return ['Middle Range', value.toFixed(1)];
-              if (name === 'upper') return ['Upper Range', value.toFixed(1)];
-              return ['Scaled Score', value.toFixed(1)];
-            }}
-          />
+          <Tooltip content={<CustomTooltip />} />
           {rangeMode ? (
             <>
-              <Bar dataKey="start" fill="#82ca9d" stackId="a" />
-              <Bar dataKey="middle" fill="#82ca9d" stackId="a" />
-              <Bar dataKey="upper" fill="#82ca9d" fillOpacity={0.3} stackId="a" />
+              <Bar 
+                dataKey="base" 
+                stackId="a" 
+                fill="transparent" 
+                stroke="transparent"
+              />
+              <Bar 
+                dataKey="middle" 
+                stackId="a" 
+                fill="#82ca9d" 
+              />
+              <Bar 
+                dataKey="upper" 
+                stackId="a" 
+                fill="#82ca9d" 
+                fillOpacity={0.3} 
+              />
             </>
           ) : (
-            <Bar dataKey="fullScore" fill="#82ca9d" />
+            <Bar dataKey="middleValue" fill="#82ca9d" />
           )}
         </BarChart>
       </ResponsiveContainer>
