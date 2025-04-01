@@ -320,16 +320,22 @@ export function SingleStudentForm() {
       selectedIndex: -1
     }));
     
-    // Focus the appropriate result input based on range mode
-    if (!isPassSubject) {
-      setTimeout(() => {
+    // Focus handling
+    setTimeout(() => {
+      if (isPassSubject) {
+        // For Pass subjects, focus the next subject input if available
+        if (index < numberOfSubjects! - 1) {
+          subjectInputRefs.current[index + 1]?.focus();
+        }
+      } else {
+        // For non-Pass subjects, focus the appropriate result input
         if (rangeMode) {
           lowerResultInputRefs.current[index]?.focus();
         } else {
           resultInputRefs.current[index]?.focus();
         }
-      }, 0);
-    }
+      }
+    }, 0);
   };
 
   // Handle keyboard navigation
@@ -385,16 +391,28 @@ export function SingleStudentForm() {
     return isNaN(num) ? 0 : num;
   };
 
+  // Helper function to get letter grade value, treating blank as 0
+  const getLetterGradeValue = (grade: string): number => {
+    if (!grade || grade.trim() === '') return 0;
+    return LETTER_GRADE_VALUES[grade as keyof typeof LETTER_GRADE_VALUES] || 0;
+  };
+
   // Maintain L ≤ R ≤ U relationship when a field changes
   const maintainRubberBandLogic = (
     entry: SubjectEntry,
     field: 'lowerResult' | 'result' | 'upperResult',
     newValue: string
   ): SubjectEntry => {
-    // Convert all values to numbers (blanks become 0)
-    const L = field === 'lowerResult' ? parseFloat(newValue) : getNumericValue(entry.lowerResult);
-    const R = field === 'result' ? parseFloat(newValue) : getNumericValue(entry.result);
-    const U = field === 'upperResult' ? parseFloat(newValue) : getNumericValue(entry.upperResult);
+    const subject = subjects.find(s => s.name === entry.subject);
+    if (!subject) return entry;
+
+    const isLetterGrade = subject.validation?.trim() === VALIDATION_TYPES.LETTER_GRADE;
+
+    // Get values based on subject type
+    const getValue = isLetterGrade ? getLetterGradeValue : getNumericValue;
+    const L = field === 'lowerResult' ? getValue(newValue) : getValue(entry.lowerResult);
+    const R = field === 'result' ? getValue(newValue) : getValue(entry.result);
+    const U = field === 'upperResult' ? getValue(newValue) : getValue(entry.upperResult);
 
     let updatedL = entry.lowerResult;
     let updatedR = entry.result;
@@ -511,11 +529,12 @@ export function SingleStudentForm() {
         // Create new entries array
         const newEntries = [...entries];
         
-        // Apply rubber band logic for numeric fields only
-        if (subject.validation?.trim() === VALIDATION_TYPES.NUMERIC) {
+        // Apply rubber band logic for numeric fields and letter grades
+        if (subject.validation?.trim() === VALIDATION_TYPES.NUMERIC || 
+            subject.validation?.trim() === VALIDATION_TYPES.LETTER_GRADE) {
           newEntries[index] = maintainRubberBandLogic(entry, field, validatedValue);
         } else {
-          // For letter grades and pass/fail, update the value and calculate scaled score
+          // For pass/fail, update the value and calculate scaled score
           const updatedEntry = {
             ...entry,
             [field]: validatedValue,
