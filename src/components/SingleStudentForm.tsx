@@ -6,6 +6,7 @@ import { SubjectSelector } from './SubjectSelector';
 import { ScaledScoreChart } from './ScaledScoreChart';
 import { Subject, Entry } from '../interfaces/types';
 import { calculateTEScore, calculateATAR, getScaledScore } from '../utils/calculations';
+import { FormHeader } from './FormHeader';
 
 export const VALIDATION_TYPES = {
   NUMERIC: "0 - 100",
@@ -717,127 +718,169 @@ export function SingleStudentForm() {
 
   return (
     <div className="single-student-form">
-      {loadingState.isLoading ? (
-        <div className="loading">Loading subject data...</div>
-      ) : loadingState.error ? (
-        <div className="error">{loadingState.error}</div>
+      {loadingState.error ? (
+        <div className="error-message">{loadingState.error}</div>
       ) : (
         <>
-          <div className="header-container">
-            <div className="subject-count-input">
-              <label htmlFor="subjectCount">Number of subjects:</label>
-              <input
-                type="number"
-                id="subjectCount"
-                min="1"
-                max="9"
-                value={numberOfSubjects || ''}
-                onChange={(e) => setNumberOfSubjects(Number(e.target.value))}
-              />
-            </div>
-          </div>
+          <FormHeader 
+            numberOfSubjects={numberOfSubjects}
+            setNumberOfSubjects={setNumberOfSubjects}
+            rangeMode={rangeMode}
+            setRangeMode={setRangeMode}
+            loadingState={loadingState}
+          />
 
-          <div className="range-mode-toggle">
-            <label>
-              <input
-                type="checkbox"
-                checked={rangeMode}
-                onChange={(e) => {
-                  setRangeMode(e.target.checked);
-                  if (e.target.checked) {
-                    // Copy result values to lower and upper when enabling range mode
-                    const newEntries = entries.map(entry => ({
-                      ...entry,
-                      lowerResult: entry.result,
-                      upperResult: entry.result
-                    }));
-                    setEntries(newEntries);
-                  }
-                }}
-              />
-              Enable Ranged ATARs
-            </label>
-          </div>
-
-          {numberOfSubjects !== null && numberOfSubjects > 0 && (
-            <>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Subject</th>
-                    {rangeMode ? (
-                      <>
-                        <th>Lower Result</th>
-                        <th>Result</th>
-                        <th>Upper Result</th>
-                      </>
-                    ) : (
-                      <th>Result</th>
-                    )}
-                    <th>Scaled</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.map((entry, index) => (
-                    <tr key={entry.originalIndex}>
-                      <td>
-                        <div className="subject-input-container">
-                          <input
-                            ref={el => subjectInputRefs.current[entry.originalIndex] = el}
-                            type="text"
-                            value={entry.subject}
-                            onChange={(e) => handleSubjectInput(entry.originalIndex, e.target.value)}
-                            onKeyDown={(e) => handleSubjectKeyDown(entry.originalIndex, e)}
-                            className="subject-input"
-                          />
-                          {selectionState.showSuggestions && selectionState.activeInputIndex === entry.originalIndex && (
-                            <div className="suggestions">
-                              {selectionState.filteredSubjects.map((subject, idx) => (
-                                <div
-                                  key={subject}
-                                  className={`suggestion-item ${idx === selectionState.selectedIndex ? 'selected' : ''}`}
-                                  onClick={() => handleSubjectSelect(entry.originalIndex, subject)}
-                                >
-                                  {subject}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </td>
+          {numberOfSubjects && (
+            <div className="calculator-chart-container">
+              <div className="calculator-section">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Subject</th>
                       {rangeMode ? (
                         <>
-                          <td>
-                            <div className="result-input-container">
-                              <input
-                                ref={el => lowerResultInputRefs.current[entry.originalIndex] = el}
-                                type="text"
-                                value={entry.lowerResult || ''}
-                                onChange={(e) => handleResultInput(entry.originalIndex, e.target.value, 'lowerResult')}
-                                onKeyDown={(e) => handleResultKeyDown(entry.originalIndex, 'lowerResult', e)}
-                                onBlur={() => handleResultBlur(entry.originalIndex, 'lowerResult')}
-                                pattern={getValidationPattern(entry.subject)}
-                                className="result-input"
-                                disabled={!entry.subject}
-                              />
-                              <div className="button-stack">
-                                <button 
-                                  className="value-adjuster"
-                                  onClick={() => handleIncrement(entry.originalIndex, 'lowerResult')}
-                                  disabled={!entry.subject}
-                                >
-                                  ▲
-                                </button>
-                                <button 
-                                  className="value-adjuster"
-                                  onClick={() => handleDecrement(entry.originalIndex, 'lowerResult')}
-                                  disabled={!entry.subject}
-                                >
-                                  ▼
-                                </button>
+                          <th>Lower Result</th>
+                          <th>Result</th>
+                          <th>Upper Result</th>
+                        </>
+                      ) : (
+                        <th>Result</th>
+                      )}
+                      <th>Scaled</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {entries.map((entry, index) => (
+                      <tr key={entry.originalIndex}>
+                        <td>
+                          <div className="subject-input-container">
+                            <input
+                              ref={el => subjectInputRefs.current[entry.originalIndex] = el}
+                              type="text"
+                              value={entry.subject}
+                              onChange={(e) => handleSubjectInput(entry.originalIndex, e.target.value)}
+                              onKeyDown={(e) => handleSubjectKeyDown(entry.originalIndex, e)}
+                              className="subject-input"
+                            />
+                            {selectionState.showSuggestions && selectionState.activeInputIndex === entry.originalIndex && (
+                              <div className="suggestions">
+                                {selectionState.filteredSubjects.map((subject, idx) => (
+                                  <div
+                                    key={subject}
+                                    className={`suggestion-item ${idx === selectionState.selectedIndex ? 'selected' : ''}`}
+                                    onClick={() => handleSubjectSelect(entry.originalIndex, subject)}
+                                  >
+                                    {subject}
+                                  </div>
+                                ))}
                               </div>
-                            </div>
-                          </td>
+                            )}
+                          </div>
+                        </td>
+                        {rangeMode ? (
+                          <>
+                            <td>
+                              <div className="result-input-container">
+                                <input
+                                  ref={el => lowerResultInputRefs.current[entry.originalIndex] = el}
+                                  type="text"
+                                  value={entry.lowerResult || ''}
+                                  onChange={(e) => handleResultInput(entry.originalIndex, e.target.value, 'lowerResult')}
+                                  onKeyDown={(e) => handleResultKeyDown(entry.originalIndex, 'lowerResult', e)}
+                                  onBlur={() => handleResultBlur(entry.originalIndex, 'lowerResult')}
+                                  pattern={getValidationPattern(entry.subject)}
+                                  className="result-input"
+                                  disabled={!entry.subject}
+                                />
+                                <div className="button-stack">
+                                  <button 
+                                    className="value-adjuster"
+                                    onClick={() => handleIncrement(entry.originalIndex, 'lowerResult')}
+                                    disabled={!entry.subject}
+                                  >
+                                    ▲
+                                  </button>
+                                  <button 
+                                    className="value-adjuster"
+                                    onClick={() => handleDecrement(entry.originalIndex, 'lowerResult')}
+                                    disabled={!entry.subject}
+                                  >
+                                    ▼
+                                  </button>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="result-input-container">
+                                <input
+                                  ref={el => resultInputRefs.current[entry.originalIndex] = el}
+                                  type="text"
+                                  value={entry.result || ''}
+                                  onChange={(e) => handleResultInput(entry.originalIndex, e.target.value, 'result')}
+                                  onKeyDown={(e) => handleResultKeyDown(entry.originalIndex, 'result', e)}
+                                  onBlur={() => handleResultBlur(entry.originalIndex, 'result')}
+                                  pattern={getValidationPattern(entry.subject)}
+                                  className="result-input"
+                                  disabled={!entry.subject}
+                                />
+                                <div className="button-stack">
+                                  <button 
+                                    className="value-adjuster"
+                                    onClick={() => handleIncrement(entry.originalIndex, 'result')}
+                                    disabled={!entry.subject}
+                                  >
+                                    ▲
+                                  </button>
+                                  <button 
+                                    className="value-adjuster"
+                                    onClick={() => handleDecrement(entry.originalIndex, 'result')}
+                                    disabled={!entry.subject}
+                                  >
+                                    ▼
+                                  </button>
+                                </div>
+                                <ValidationHint
+                                  subject={entry.subject}
+                                  value={entry.result || ''}
+                                  showSuggestions={selectionState.showSuggestions}
+                                  subjectsLoaded={subjects.length > 0}
+                                  subjects={subjects}
+                                />
+                              </div>
+                            </td>
+                            <td>
+                              <div className="result-input-container">
+                                <input
+                                  ref={el => upperResultInputRefs.current[entry.originalIndex] = el}
+                                  type="text"
+                                  value={entry.upperResult || ''}
+                                  onChange={(e) => handleResultInput(entry.originalIndex, e.target.value, 'upperResult')}
+                                  onKeyDown={(e) => handleResultKeyDown(entry.originalIndex, 'upperResult', e)}
+                                  onBlur={() => handleResultBlur(entry.originalIndex, 'upperResult')}
+                                  pattern={getValidationPattern(entry.subject)}
+                                  className="result-input"
+                                  disabled={!entry.subject}
+                                />
+                                <div className="button-stack">
+                                  <button 
+                                    className="value-adjuster"
+                                    onClick={() => handleIncrement(entry.originalIndex, 'upperResult')}
+                                    disabled={!entry.subject}
+                                  >
+                                    ▲
+                                  </button>
+                                  <button 
+                                    className="value-adjuster"
+                                    onClick={() => handleDecrement(entry.originalIndex, 'upperResult')}
+                                    disabled={!entry.subject}
+                                  >
+                                    ▼
+                                  </button>
+                                </div>
+                              </div>
+                            </td>
+                          </>
+                        ) : (
                           <td>
                             <div className="result-input-container">
                               <input
@@ -876,112 +919,44 @@ export function SingleStudentForm() {
                               />
                             </div>
                           </td>
-                          <td>
-                            <div className="result-input-container">
-                              <input
-                                ref={el => upperResultInputRefs.current[entry.originalIndex] = el}
-                                type="text"
-                                value={entry.upperResult || ''}
-                                onChange={(e) => handleResultInput(entry.originalIndex, e.target.value, 'upperResult')}
-                                onKeyDown={(e) => handleResultKeyDown(entry.originalIndex, 'upperResult', e)}
-                                onBlur={() => handleResultBlur(entry.originalIndex, 'upperResult')}
-                                pattern={getValidationPattern(entry.subject)}
-                                className="result-input"
-                                disabled={!entry.subject}
-                              />
-                              <div className="button-stack">
-                                <button 
-                                  className="value-adjuster"
-                                  onClick={() => handleIncrement(entry.originalIndex, 'upperResult')}
-                                  disabled={!entry.subject}
-                                >
-                                  ▲
-                                </button>
-                                <button 
-                                  className="value-adjuster"
-                                  onClick={() => handleDecrement(entry.originalIndex, 'upperResult')}
-                                  disabled={!entry.subject}
-                                >
-                                  ▼
-                                </button>
-                              </div>
-                            </div>
-                          </td>
-                        </>
-                      ) : (
+                        )}
                         <td>
-                          <div className="result-input-container">
-                            <input
-                              ref={el => resultInputRefs.current[entry.originalIndex] = el}
-                              type="text"
-                              value={entry.result || ''}
-                              onChange={(e) => handleResultInput(entry.originalIndex, e.target.value, 'result')}
-                              onKeyDown={(e) => handleResultKeyDown(entry.originalIndex, 'result', e)}
-                              onBlur={() => handleResultBlur(entry.originalIndex, 'result')}
-                              pattern={getValidationPattern(entry.subject)}
-                              className="result-input"
-                              disabled={!entry.subject}
-                            />
-                            <div className="button-stack">
-                              <button 
-                                className="value-adjuster"
-                                onClick={() => handleIncrement(entry.originalIndex, 'result')}
-                                disabled={!entry.subject}
-                              >
-                                ▲
-                              </button>
-                              <button 
-                                className="value-adjuster"
-                                onClick={() => handleDecrement(entry.originalIndex, 'result')}
-                                disabled={!entry.subject}
-                              >
-                                ▼
-                              </button>
-                            </div>
-                            <ValidationHint
-                              subject={entry.subject}
-                              value={entry.result || ''}
-                              showSuggestions={selectionState.showSuggestions}
-                              subjectsLoaded={subjects.length > 0}
-                              subjects={subjects}
-                            />
+                          <div className="scaled-score">
+                            {rangeMode ? (
+                              entry.subject && (
+                                <span>
+                                  ({getScaledScore(entry.subject, entry.lowerResult, 0).toFixed(1)} - {entry.scaledScore?.toFixed(1)} - {getScaledScore(entry.subject, entry.upperResult, 0).toFixed(1)})
+                                </span>
+                              )
+                            ) : (
+                              entry.scaledScore !== undefined && (
+                                <span>{entry.scaledScore.toFixed(1)}</span>
+                              )
+                            )}
                           </div>
                         </td>
-                      )}
-                      <td>
-                        <div className="scaled-score">
-                          {rangeMode ? (
-                            entry.subject && (
-                              <span>
-                                ({getScaledScore(entry.subject, entry.lowerResult, 0).toFixed(1)} - {entry.scaledScore?.toFixed(1)} - {getScaledScore(entry.subject, entry.upperResult, 0).toFixed(1)})
-                              </span>
-                            )
-                          ) : (
-                            entry.scaledScore !== undefined && (
-                              <span>{entry.scaledScore.toFixed(1)}</span>
-                            )
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              
-              <ScaledScoreChart 
-                entries={entries.filter(entry => entry.subject && entry.scaledScore !== undefined)}
-                rangeMode={rangeMode}
-                getScaledScore={getScaledScore}
-              />
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                
+                <ResultsDisplay 
+                  teScore={teScore}
+                  atar={atar}
+                  rangeMode={rangeMode}
+                  rangedTEScores={rangedResults?.teScores}
+                  rangedATARs={rangedResults?.atars}
+                />
+              </div>
 
-              <ResultsDisplay 
-                teScore={teScore}
-                atar={atar}
-                rangeMode={rangeMode}
-                rangedTEScores={rangedResults?.teScores}
-                rangedATARs={rangedResults?.atars}
-              />
-            </>
+              <div className="chart-section">
+                <ScaledScoreChart 
+                  entries={entries.filter(entry => entry.subject && entry.scaledScore !== undefined)}
+                  rangeMode={rangeMode}
+                  getScaledScore={getScaledScore}
+                />
+              </div>
+            </div>
           )}
         </>
       )}

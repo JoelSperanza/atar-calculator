@@ -1,5 +1,24 @@
 .single-student-form {
-  width: 700px;
+  padding: 20px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Add flex container for calculator and chart */
+.calculator-chart-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.calculator-section {
+  flex: 1;
+  min-width: 0; /* Prevents flex item from overflowing */
+}
+
+.chart-section {
+  flex: 1;
+  min-width: 0; /* Prevents flex item from overflowing */
 }
 
 .header-container {
