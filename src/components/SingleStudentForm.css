@@ -90,7 +90,14 @@ th:last-child {
 }
 
 .scaled-score {
-  background-color: #f8f9fa;
+  min-width: 180px;
+  white-space: nowrap;
+  text-align: center;
+  padding: 0 8px;
+}
+
+table th:last-child {
+  min-width: 180px;
 }
 
 .suggestions {
