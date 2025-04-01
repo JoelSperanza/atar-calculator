@@ -1,24 +1,25 @@
 .single-student-form {
   padding: 20px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 1600px;  /* Add a max-width to prevent excessive stretching */
   margin: 0 auto;
 }
 
 /* Add flex container for calculator and chart */
 .calculator-chart-container {
   display: flex;
-  gap: 20px;
+  gap: 32px;
   align-items: flex-start;
 }
 
 .calculator-section {
-  flex: 1;
-  min-width: 0; /* Prevents flex item from overflowing */
+  flex: 0 0 auto;  /* Don't allow calculator to shrink or grow */
+  width: 800px;     /* Fixed width for calculator section */
 }
 
 .chart-section {
-  flex: 1;
-  min-width: 0; /* Prevents flex item from overflowing */
+  flex: 1;          /* Allow chart to take remaining space */
+  min-width: 400px; /* Minimum width for chart */
 }
 
 .header-container {
@@ -108,7 +109,11 @@ th:last-child {
   width: 100px;
 }
 
+/* Ensure scaled scores appear above chart */
 .scaled-score {
+  position: relative;
+  z-index: 2;
+  background: white;
   min-width: 180px;
   white-space: nowrap;
   text-align: center;
