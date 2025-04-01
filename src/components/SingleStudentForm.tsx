@@ -3,6 +3,7 @@ import './SingleStudentForm.css';
 import { ValidationHint } from './ValidationHint';
 import { ResultsDisplay } from './ResultsDisplay';
 import { SubjectSelector } from './SubjectSelector';
+import { ScaledScoreChart } from './ScaledScoreChart';
 import { Subject, Entry } from '../interfaces/types';
 import { calculateTEScore, calculateATAR, getScaledScore } from '../utils/calculations';
 
@@ -967,6 +968,11 @@ export function SingleStudentForm() {
                 </tbody>
               </table>
               
+              <ScaledScoreChart 
+                entries={entries.filter(entry => entry.subject && entry.scaledScore !== undefined)}
+                rangeMode={rangeMode}
+              />
+
               <ResultsDisplay 
                 teScore={teScore}
                 atar={atar}
