@@ -53,23 +53,42 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
   });
 
   // Transform data for Recharts
+  const lowestScore = Math.min(...entries.filter(e => e.subject).map(e => {
+    const score = e.scaledScore || 0;
+    const lowerScore = e.subject ? getScaledScore(e.subject, e.lowerResult || '0', 0) : 0;
+    return Math.min(score, lowerScore);
+  }));
+  const xAxisMin = Math.max(0, Math.floor((lowestScore - 10) / 10) * 10);  // Round down to nearest 10
+
+  // Transform data for Recharts
   const chartData: ChartDataPoint[] = sortedEntries.map(entry => {
     const lowerScore = entry.subject ? getScaledScore(entry.subject, entry.lowerResult || '0', 0) : 0;
     const currentScore = entry.scaledScore || 0;
     const upperScore = entry.subject ? getScaledScore(entry.subject, entry.upperResult || '0', 0) : 0;
 
+    // If all values are equal, add tiny offsets to create visual width
+    const adjustedLowerScore = (lowerScore === currentScore && currentScore === upperScore) ? lowerScore - 0.1 : lowerScore;
+    const adjustedUpperScore = (lowerScore === currentScore && currentScore === upperScore) ? upperScore + 0.1 : upperScore;
+
+    // Shift all values relative to xAxisMin
     return {
       subject: entry.subject,
       // Values for stacking (relative heights)
-      base: lowerScore,
-      middle: currentScore - lowerScore,
-      upper: upperScore - currentScore,
+      base: adjustedLowerScore - xAxisMin,
+      middle: currentScore - adjustedLowerScore,
+      upper: adjustedUpperScore - currentScore,
       // Actual values for tooltip
       lowerValue: lowerScore,
       middleValue: currentScore,
       upperValue: upperScore
     };
   });
+  
+  // Generate ticks from 0 to (100 - xAxisMin)
+  const xAxisTicks = Array.from(
+    { length: Math.ceil((100 - xAxisMin) / 10) + 1 },
+    (_, i) => i * 10
+  ).filter(tick => tick <= (100 - xAxisMin));
 
   return (
     <div className="scaled-score-chart">
@@ -79,13 +98,14 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
           data={chartData}
           layout="vertical"
           margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
-          barSize={20}
+          barSize={50}
         >
           <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} />
           <XAxis 
             type="number" 
-            domain={[0, 100]} 
-            ticks={[0, 25, 50, 75, 100]}
+            domain={[0, 100 - xAxisMin]}
+            ticks={xAxisTicks}
+            tickFormatter={(value) => `${value + xAxisMin}`}
           />
           <YAxis 
             type="category" 
@@ -105,25 +125,24 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
               <Bar 
                 dataKey="middle" 
                 stackId="a" 
-                fill="#82ca9d" 
+                fill="#3584e4" 
                 stroke="#000"
-                strokeWidth={1}
+                strokeWidth={2}
               />
               <Bar 
                 dataKey="upper" 
                 stackId="a" 
-                fill="#82ca9d" 
-                fillOpacity={0.3}
+                fill="#3584e4" 
                 stroke="#000"
-                strokeWidth={1}
+                strokeWidth={2}
               />
             </>
           ) : (
             <Bar 
               dataKey="middleValue" 
-              fill="#82ca9d"
+              fill="#3584e4"
               stroke="#000"
-              strokeWidth={1}
+              strokeWidth={2}
             />
           )}
         </BarChart>

@@ -64,12 +64,13 @@
 table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 8px;
+  border-spacing: 0;
+  table-layout: fixed;
 }
 
 th {
   text-align: left;
-  padding: 8px;
+  padding: 8px 4px;  /* Reduce horizontal padding */
   color: #666;
   font-weight: 500;
   font-size: 0.9rem;
@@ -77,23 +78,18 @@ th {
 }
 
 td {
-  padding: 0;
-  padding-right: 20px;
-}
-
-td:last-child {
-  padding-right: 20px;
+  padding: 4px;  /* Consistent small padding */
 }
 
 .subject-input-container {
   position: relative;
   width: 285px;
+  padding-right: 4px;  /* Add small padding to match other columns */
 }
 
 .subject-input,
 .result-input,
 .scaled-score {
-  width: 100%;
   height: 40px;
   padding: 8px 12px;
   border: 1px solid #e0e0e0;
@@ -104,24 +100,37 @@ td:last-child {
   box-sizing: border-box;
 }
 
-.result-input,
-.scaled-score {
-  width: 100px;
+/* Specific widths for each type */
+table td .subject-input {
+  width: 100%;
 }
 
-/* Make result inputs narrower */
-.result-input {
-  width: 45px;  /* Enough for 2 digits plus some padding */
-  text-align: center;
+table td .result-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 85px;  /* Fixed width for container */
 }
 
-/* Style for multi-line column headers */
-th.result-header {
+table td .result-input-container .result-input {
+  width: 65px !important;
+  box-sizing: border-box;
+}
+
+table td .scaled-score {
+  width: 180px;
+}
+
+/* Header widths to match */
+table th.result-header {
   text-align: center;
-  white-space: normal;  /* Allow text to wrap */
-  width: 45px;         /* Match input width */
-  line-height: 1.2;    /* Tighter line spacing */
-  padding: 8px 4px;    /* Reduced horizontal padding */
+  white-space: normal;
+  width: 85px;
+  min-width: 85px;
+  line-height: 1.2;
+  padding: 8px 4px;
 }
 
 /* Ensure scaled scores appear above chart */
@@ -132,12 +141,12 @@ th.result-header {
   min-width: 180px;
   white-space: nowrap;
   text-align: center;
-  padding: 0 8px;
+  padding: 0 4px;
 }
 
 table th:last-child {
   min-width: 180px;
-  padding-right: 20px;
+  padding-right: 4px;  /* Consistent padding */
 }
 
 .suggestions {
@@ -163,13 +172,6 @@ table th:last-child {
 .suggestion-item.selected {
   background-color: #f0f7ff;
   color: #0066ff;
-}
-
-.result-input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 
 .button-stack {

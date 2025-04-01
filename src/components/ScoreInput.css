@@ -1,0 +1,71 @@
+.score-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-input-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.score-input {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.button-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.value-adjuster {
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.value-adjuster:hover:not(:disabled) {
+  background: #f0f0f0;
+}
+
+.value-adjuster:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.range-separator {
+  color: #666;
+  font-weight: bold;
+}
+
+.scaled-score {
+  min-width: 60px;
+  text-align: right;
+  color: #666;
+  font-weight: 500;
+}
+
+.validation-hint {
+  color: #666;
+  font-size: 12px;
+} 

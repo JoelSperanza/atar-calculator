@@ -128,10 +128,15 @@ export function SingleStudentForm() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [generalSubjects, setGeneralSubjects] = useState<GeneralSubject[]>([]);
   const [appliedSubjects, setAppliedSubjects] = useState<AppliedSubject[]>([]);
-  const [entries, setEntries] = useState<SubjectEntry[]>([]);
+  const [entries, setEntries] = useState<SubjectEntry[]>(Array(7).fill(null).map((_, index) => ({
+    subject: '',
+    result: '',
+    lowerResult: '',
+    upperResult: '',
+    originalIndex: index
+  })));
   
   // UI states
-  const [numberOfSubjects, setNumberOfSubjects] = useState<number | null>(null);
   const [maxSubjectWidth, setMaxSubjectWidth] = useState<number>(0);
   const [rangeMode, setRangeMode] = useState(false);
   
@@ -206,25 +211,6 @@ export function SingleStudentForm() {
 
     loadAllData();
   }, []);
-
-  // Initialize entries when number of subjects is set
-  useEffect(() => {
-    if (numberOfSubjects !== null && numberOfSubjects > 0) {
-      const initialEntries = Array(numberOfSubjects).fill(null).map((_, index) => ({
-        subject: '',
-        result: '',
-        lowerResult: '',
-        upperResult: '',
-        originalIndex: index
-      }));
-      setEntries(initialEntries);
-      // Initialize refs arrays
-      resultInputRefs.current = Array(numberOfSubjects).fill(null);
-      lowerResultInputRefs.current = Array(numberOfSubjects).fill(null);
-      upperResultInputRefs.current = Array(numberOfSubjects).fill(null);
-      subjectInputRefs.current = Array(numberOfSubjects).fill(null);
-    }
-  }, [numberOfSubjects]);
 
   // Calculate scaled score using the logistic function for general subjects
   const calculateGeneralScaledScore = (subject: string, rawScore: number): number => {
@@ -326,7 +312,7 @@ export function SingleStudentForm() {
     setTimeout(() => {
       if (isPassSubject) {
         // For Pass subjects, focus the next subject input if available
-        if (index < numberOfSubjects! - 1) {
+        if (index < entries.length - 1) {
           subjectInputRefs.current[index + 1]?.focus();
         }
       } else {
@@ -342,7 +328,7 @@ export function SingleStudentForm() {
 
   // Handle keyboard navigation
   const handleSubjectKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey)) {
       // Always check for exact match first (case-insensitive)
       const exactMatch = subjects.find(s => 
         s.name.toLowerCase() === selectionState.currentInput.toLowerCase()
@@ -502,7 +488,7 @@ export function SingleStudentForm() {
   };
 
   const handleResultKeyDown = (index: number, field: 'lowerResult' | 'result' | 'upperResult', e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey)) {
       e.preventDefault();
       const entry = entries[index];
       const subject = subjects.find(s => s.name === entry.subject);
@@ -716,6 +702,50 @@ export function SingleStudentForm() {
 
   const rangedResults = getRangedResults();
 
+  // Handle quick range application
+  const handleQuickRange = (range: number) => {
+    console.log('Quick range called with range:', range, typeof range);
+    
+    // Create a completely new array to ensure state update
+    const newEntries = entries.map(entry => {
+      // Skip entries without subject or result
+      if (!entry.subject || !entry.result) return { ...entry };
+
+      const subject = subjects.find(s => s.name === entry.subject);
+      if (!subject || subject.validation?.trim() !== VALIDATION_TYPES.NUMERIC) return { ...entry };
+
+      const currentValue = parseInt(entry.result);
+      if (isNaN(currentValue)) return { ...entry };
+
+      // Calculate new values
+      const lowerValue = Math.max(0, currentValue - range);
+      const upperValue = Math.min(100, currentValue + range);
+
+      console.log('Processing entry:', {
+        subject: entry.subject,
+        currentValue,
+        range,
+        lower: lowerValue,
+        upper: upperValue
+      });
+
+      // First update the lower result
+      let updatedEntry = maintainRubberBandLogic(entry, 'lowerResult', lowerValue.toString());
+      // Then update the upper result
+      updatedEntry = maintainRubberBandLogic(updatedEntry, 'upperResult', upperValue.toString());
+
+      return updatedEntry;
+    });
+
+    // Force a re-render by creating a new array
+    setEntries([...newEntries]);
+    
+    // Ensure range mode is enabled
+    if (!rangeMode) {
+      setRangeMode(true);
+    }
+  };
+
   return (
     <div className="single-student-form">
       {loadingState.error ? (
@@ -723,23 +753,38 @@ export function SingleStudentForm() {
       ) : (
         <>
           <FormHeader 
-            numberOfSubjects={numberOfSubjects}
-            setNumberOfSubjects={setNumberOfSubjects}
             rangeMode={rangeMode}
-            setRangeMode={setRangeMode}
+            setRangeMode={(mode) => {
+              setRangeMode(mode);
+              if (!mode) {
+                // Clear range values when disabling range mode
+                setEntries(entries.map(entry => ({
+                  ...entry,
+                  lowerResult: '',
+                  upperResult: ''
+                })));
+              }
+            }}
             loadingState={loadingState}
+            onQuickRange={handleQuickRange}
           />
 
-          {numberOfSubjects && (
+          {entries.length > 0 && (
             <div className="calculator-chart-container">
               <div className="calculator-section">
                 <table>
                   <thead>
                     <tr>
                       <th>SUBJECT</th>
-                      <th className="result-header">LOWER{'\n'}RESULT</th>
-                      <th className="result-header">RESULT</th>
-                      <th className="result-header">UPPER{'\n'}RESULT</th>
+                      {rangeMode ? (
+                        <>
+                          <th className="result-header">LOWER{'\n'}RESULT</th>
+                          <th className="result-header">RESULT</th>
+                          <th className="result-header">UPPER{'\n'}RESULT</th>
+                        </>
+                      ) : (
+                        <th className="result-header">RESULT</th>
+                      )}
                       <th>SCALED</th>
                     </tr>
                   </thead>
@@ -947,7 +992,7 @@ export function SingleStudentForm() {
                 <ScaledScoreChart 
                   entries={entries.filter(entry => entry.subject && entry.scaledScore !== undefined)}
                   rangeMode={rangeMode}
-                  getScaledScore={getScaledScore}
+                  getScaledScore={(subject: string, result: string, scale: number) => getScaledScore(subject, result, scale)}
                 />
               </div>
             </div>
