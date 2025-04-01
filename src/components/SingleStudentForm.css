@@ -14,12 +14,13 @@
 
 .calculator-section {
   flex: 0 0 auto;  /* Don't allow calculator to shrink or grow */
-  width: 800px;     /* Fixed width for calculator section */
+  width: 900px;  /* Increased to accommodate scaled scores */
 }
 
 .chart-section {
   flex: 1;          /* Allow chart to take remaining space */
-  min-width: 400px; /* Minimum width for chart */
+  min-width: 500px; /* Minimum width for chart */
+  margin-left: 20px;  /* Add some space between calculator and chart */
 }
 
 .header-container {
@@ -80,9 +81,8 @@ td {
   padding-right: 20px;
 }
 
-td:last-child,
-th:last-child {
-  padding-right: 0;
+td:last-child {
+  padding-right: 20px;
 }
 
 .subject-input-container {
@@ -122,6 +122,7 @@ th:last-child {
 
 table th:last-child {
   min-width: 180px;
+  padding-right: 20px;
 }
 
 .suggestions {

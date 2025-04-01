@@ -78,7 +78,7 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
         <BarChart
           data={chartData}
           layout="vertical"
-          margin={{ top: 5, right: 30, left: 150, bottom: 5 }}
+          margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
           barSize={20}
         >
           <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} />
@@ -90,7 +90,7 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
           <YAxis 
             type="category" 
             dataKey="subject" 
-            width={150}
+            width={120}
             tick={{ fill: '#666' }}
           />
           <Tooltip content={<CustomTooltip />} />
@@ -105,7 +105,7 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
               <Bar 
                 dataKey="middle" 
                 stackId="a" 
-                fill="#82ca9d"
+                fill="#82ca9d" 
                 stroke="#000"
                 strokeWidth={1}
               />
