@@ -5,4 +5,28 @@
   border-radius: 8px;
   padding: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scaled-score-chart h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+/* Override Recharts default styles */
+.scaled-score-chart .recharts-cartesian-grid-horizontal line,
+.scaled-score-chart .recharts-cartesian-grid-vertical line {
+  stroke: #eee;
+  stroke-dasharray: 3 3;
+}
+
+.scaled-score-chart .recharts-yAxis .recharts-text {
+  fill: #666;
+  font-size: 0.9em;
+}
+
+.scaled-score-chart .recharts-xAxis .recharts-text {
+  fill: #666;
+  font-size: 0.9em;
 } 
