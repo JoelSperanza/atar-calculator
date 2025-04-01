@@ -677,6 +677,43 @@ export function SingleStudentForm() {
     setEntries(newEntries);
   };
 
+  // Calculate current scores
+  const teScore = calculateTEScore(entries, subjects);
+  const atar = teScore !== null ? calculateATAR(teScore) : null;
+
+  // Calculate ranged scores when in range mode
+  const getRangedResults = () => {
+    if (!rangeMode) return null;
+
+    // Create entries arrays for lower and upper bounds
+    const lowerEntries = entries.map(entry => ({
+      ...entry,
+      scaledScore: entry.subject ? getScaledScore(entry.subject, entry.lowerResult, 0) : undefined
+    }));
+
+    const upperEntries = entries.map(entry => ({
+      ...entry,
+      scaledScore: entry.subject ? getScaledScore(entry.subject, entry.upperResult, 0) : undefined
+    }));
+
+    // Calculate TE scores for each set
+    const lowerTE = calculateTEScore(lowerEntries, subjects) || 0;
+    const currentTE = teScore || 0;
+    const upperTE = calculateTEScore(upperEntries, subjects) || 0;
+
+    // Calculate ATARs
+    const lowerATAR = calculateATAR(lowerTE);
+    const currentATAR = atar || 30;
+    const upperATAR = calculateATAR(upperTE);
+
+    return {
+      teScores: { lower: lowerTE, current: currentTE, upper: upperTE },
+      atars: { lower: lowerATAR, current: currentATAR, upper: upperATAR }
+    };
+  };
+
+  const rangedResults = getRangedResults();
+
   return (
     <div className="single-student-form">
       {loadingState.isLoading ? (
@@ -912,8 +949,16 @@ export function SingleStudentForm() {
                       )}
                       <td>
                         <div className="scaled-score">
-                          {entry.scaledScore !== undefined && (
-                            <span>{entry.scaledScore}</span>
+                          {rangeMode ? (
+                            entry.subject && (
+                              <span>
+                                ({getScaledScore(entry.subject, entry.lowerResult, 0).toFixed(1)} - {entry.scaledScore?.toFixed(1)} - {getScaledScore(entry.subject, entry.upperResult, 0).toFixed(1)})
+                              </span>
+                            )
+                          ) : (
+                            entry.scaledScore !== undefined && (
+                              <span>{entry.scaledScore.toFixed(1)}</span>
+                            )
                           )}
                         </div>
                       </td>
@@ -923,8 +968,11 @@ export function SingleStudentForm() {
               </table>
               
               <ResultsDisplay 
-                teScore={calculateTEScore(entries, subjects)} 
-                atar={calculateTEScore(entries, subjects) !== null ? calculateATAR(calculateTEScore(entries, subjects)!) : null} 
+                teScore={teScore}
+                atar={atar}
+                rangeMode={rangeMode}
+                rangedTEScores={rangedResults?.teScores}
+                rangedATARs={rangedResults?.atars}
               />
             </>
           )}
