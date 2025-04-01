@@ -638,14 +638,7 @@ export function SingleStudentForm() {
         const currentIndex = grades.indexOf(currentGrade);
         if (currentIndex < grades.length - 1) {
           newValue = grades[currentIndex + 1];
-          const updatedEntry = {
-            ...entry,
-            [field]: newValue,
-          };
-          if (field === 'result') {
-            updatedEntry.scaledScore = getScaledScore(entry.subject, newValue, 0);
-          }
-          newEntries[index] = updatedEntry;
+          newEntries[index] = maintainRubberBandLogic(entry, field, newValue);
         }
         break;
     }
@@ -676,14 +669,7 @@ export function SingleStudentForm() {
         const currentIndex = grades.indexOf(currentGrade);
         if (currentIndex > 0) {
           newValue = grades[currentIndex - 1];
-          const updatedEntry = {
-            ...entry,
-            [field]: newValue,
-          };
-          if (field === 'result') {
-            updatedEntry.scaledScore = getScaledScore(entry.subject, newValue, 0);
-          }
-          newEntries[index] = updatedEntry;
+          newEntries[index] = maintainRubberBandLogic(entry, field, newValue);
         }
         break;
     }
