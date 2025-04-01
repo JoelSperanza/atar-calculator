@@ -1,0 +1,50 @@
+import { VALIDATION_TYPES, VALIDATION_HINTS } from './SingleStudentForm';
+
+interface Subject {
+  name: string;
+  type: string;
+  validation: string;
+}
+
+interface ValidationHintProps {
+  subject: string;
+  value: string;
+  showSuggestions: boolean;
+  subjectsLoaded: boolean;
+  subjects: Subject[];
+}
+
+export function ValidationHint({ 
+  subject, 
+  value, 
+  showSuggestions, 
+  subjectsLoaded,
+  subjects
+}: ValidationHintProps) {
+  if (!subject || value || showSuggestions || !subjectsLoaded) {
+    return null;
+  }
+
+  const getValidationHint = (validation: string): string => {
+    const cleanValidation = validation.replace(/\r$/, '');
+    switch (cleanValidation) {
+      case VALIDATION_TYPES.NUMERIC:
+        return VALIDATION_HINTS.NUMERIC;
+      case VALIDATION_TYPES.LETTER_GRADE:
+        return VALIDATION_HINTS.LETTER_GRADE;
+      case VALIDATION_TYPES.PASS:
+        return VALIDATION_HINTS.PASS;
+      default:
+        return "";
+    }
+  };
+
+  const validation = subjects.find(s => s.name === subject)?.validation;
+  if (!validation) return null;
+
+  return (
+    <div className="validation-hint" role="tooltip">
+      {getValidationHint(validation)}
+    </div>
+  );
+} 
