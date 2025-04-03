@@ -1,0 +1,223 @@
+.equivalent-calculator {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.calculator-inputs {
+  margin: 2rem 0;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.input-group span {
+  white-space: nowrap;
+}
+
+.score-input {
+  width: 80px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.subject-select {
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: white;
+}
+
+.calculator-results {
+  margin-top: 2rem;
+}
+
+.calculator-results > p {
+  margin: 0 0 1rem 0;
+}
+
+.comparison-group {
+  margin: 0.75rem 0;
+}
+
+.comparison-inputs {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.result-box {
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  min-width: 60px;
+  text-align: center;
+  font-family: monospace;
+  font-size: 1.1rem;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.impossible-score {
+  color: #ff0000;
+  font-size: 0.95rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  white-space: pre-line;
+  line-height: 1;
+}
+
+.better-score {
+  color: #008000;
+  border-color: #008000;
+}
+
+.better-score-subject {
+  color: #008000;
+}
+
+.worse-score {
+  color: #cc0000;
+  border-color: #cc0000;
+}
+
+.worse-score-subject {
+  color: #cc0000;
+}
+
+/* Disabled state for select options */
+.subject-select option:disabled {
+  color: #999;
+  font-style: italic;
+}
+
+/* Focus states */
+.score-input:focus,
+.subject-select:focus {
+  outline: none;
+  border-color: #0066ff;
+  box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.1);
+}
+
+/* Hover states */
+.score-input:hover,
+.subject-select:hover {
+  border-color: #999;
+}
+
+/* Placeholder styling */
+.score-input::placeholder {
+  color: #999;
+}
+
+/* Disabled states */
+.score-input:disabled,
+.subject-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* Responsive layout */
+@media (max-width: 1200px) {
+  .calculator-results {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scaled-score {
+  color: #666;
+  font-size: 0.9rem;
+  font-family: monospace;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  justify-content: flex-start;
+}
+
+.random-button, .clear-button {
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.random-button {
+  background-color: #0066ff;
+  color: white;
+}
+
+.random-button:hover:not(:disabled) {
+  background-color: #0052cc;
+}
+
+.random-button:active:not(:disabled) {
+  background-color: #004099;
+}
+
+.clear-button {
+  background-color: #666;
+  color: white;
+}
+
+.clear-button:hover:not(:disabled) {
+  background-color: #555;
+}
+
+.clear-button:active:not(:disabled) {
+  background-color: #444;
+}
+
+.random-button:disabled,
+.clear-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.subject-select:focus {
+  outline: none;
+  border-color: #0066ff;
+  box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.1);
+}
+
+.subject-select.better-score-subject {
+  border-color: #4caf50;
+}
+
+.subject-select.worse-score-subject {
+  border-color: #f44336;
+}
+
+.subject-select.better-score-subject:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+}
+
+.subject-select.worse-score-subject:focus {
+  border-color: #f44336;
+  box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.1);
+} 

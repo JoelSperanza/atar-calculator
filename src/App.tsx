@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { SingleStudentForm } from './components/SingleStudentForm'
+import { ScalingGraphs } from './components/ScalingGraphs'
+import { EquivalentCalculator } from './components/EquivalentCalculator'
 import './App.css'
 
 function App() {
-  const [selectedMode, setSelectedMode] = useState<'single' | 'cohort' | 'scaling' | null>(null)
+  const [selectedMode, setSelectedMode] = useState<'single' | 'cohort' | 'scaling' | 'equivalent' | null>(null)
 
   return (
     <div className="app-container">
@@ -28,6 +30,12 @@ function App() {
           >
             Scaling Graphs
           </button>
+          <button 
+            className="mode-button"
+            onClick={() => setSelectedMode('equivalent')}
+          >
+            Equivalent Score Calculator
+          </button>
         </div>
       ) : (
         <div>
@@ -41,8 +49,10 @@ function App() {
             <SingleStudentForm />
           ) : selectedMode === 'cohort' ? (
             <h2>Cohort Mode</h2>
+          ) : selectedMode === 'scaling' ? (
+            <ScalingGraphs />
           ) : (
-            <h2>Scaling Graphs</h2>
+            <EquivalentCalculator />
           )}
         </div>
       )}
