@@ -3,7 +3,7 @@ import { SingleStudentForm } from './components/SingleStudentForm'
 import './App.css'
 
 function App() {
-  const [selectedMode, setSelectedMode] = useState<'single' | 'cohort' | null>(null)
+  const [selectedMode, setSelectedMode] = useState<'single' | 'cohort' | 'scaling' | null>(null)
 
   return (
     <div className="app-container">
@@ -22,6 +22,12 @@ function App() {
           >
             Cohort ATAR Predictions
           </button>
+          <button 
+            className="mode-button"
+            onClick={() => setSelectedMode('scaling')}
+          >
+            Scaling Graphs
+          </button>
         </div>
       ) : (
         <div>
@@ -33,8 +39,10 @@ function App() {
           </button>
           {selectedMode === 'single' ? (
             <SingleStudentForm />
-          ) : (
+          ) : selectedMode === 'cohort' ? (
             <h2>Cohort Mode</h2>
+          ) : (
+            <h2>Scaling Graphs</h2>
           )}
         </div>
       )}

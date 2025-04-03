@@ -19,6 +19,10 @@ function formatRange(scores: RangedScores): string {
   return `(${scores.lower.toFixed(1)} - ${scores.current.toFixed(1)} - ${scores.upper.toFixed(1)})`;
 }
 
+function formatATARRange(scores: RangedScores): string {
+  return `(${scores.lower.toFixed(2)} - ${scores.current.toFixed(2)} - ${scores.upper.toFixed(2)})`;
+}
+
 export function ResultsDisplay({ 
   teScore, 
   atar, 
@@ -35,7 +39,7 @@ export function ResultsDisplay({
         </div>
         <div className="atar-container">
           <span className="atar-label">ATAR:</span>
-          <span className="atar-value">{atar?.toFixed(1) ?? 'Not eligible'}</span>
+          <span className="atar-value">{atar?.toFixed(2) ?? 'Not eligible'}</span>
         </div>
       </div>
     );
@@ -52,7 +56,7 @@ export function ResultsDisplay({
       <div className="atar-container">
         <span className="atar-label">ATAR Range:</span>
         <span className="atar-value">
-          {rangedATARs ? formatRange(rangedATARs) : 'Not eligible'}
+          {rangedATARs ? formatATARRange(rangedATARs) : 'Not eligible'}
         </span>
       </div>
     </div>

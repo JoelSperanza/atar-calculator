@@ -685,14 +685,24 @@ export function SingleStudentForm() {
     }));
 
     // Calculate TE scores for each set
-    const lowerTE = calculateTEScore(lowerEntries, subjects) || 0;
-    const currentTE = teScore || 0;
-    const upperTE = calculateTEScore(upperEntries, subjects) || 0;
+    const lowerTE = calculateTEScore(lowerEntries, subjects);
+    const currentTE = teScore;
+    const upperTE = calculateTEScore(upperEntries, subjects);
+
+    // If any TE score is null, the student is ineligible
+    if (lowerTE === null || currentTE === null || upperTE === null) {
+      return null;
+    }
 
     // Calculate ATARs
     const lowerATAR = calculateATAR(lowerTE);
-    const currentATAR = atar || 30;
+    const currentATAR = atar;
     const upperATAR = calculateATAR(upperTE);
+
+    // If any ATAR is null, the student is ineligible
+    if (lowerATAR === null || currentATAR === null || upperATAR === null) {
+      return null;
+    }
 
     return {
       teScores: { lower: lowerTE, current: currentTE, upper: upperTE },
@@ -762,6 +772,13 @@ export function SingleStudentForm() {
                   ...entry,
                   lowerResult: '',
                   upperResult: ''
+                })));
+              } else {
+                // Copy result values to both lower and upper when enabling range mode
+                setEntries(entries.map(entry => ({
+                  ...entry,
+                  lowerResult: entry.result,
+                  upperResult: entry.result
                 })));
               }
             }}

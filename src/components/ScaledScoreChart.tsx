@@ -53,11 +53,13 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
   });
 
   // Transform data for Recharts
-  const lowestScore = Math.min(...entries.filter(e => e.subject).map(e => {
-    const score = e.scaledScore || 0;
-    const lowerScore = e.subject ? getScaledScore(e.subject, e.lowerResult || '0', 0) : 0;
-    return Math.min(score, lowerScore);
-  }));
+  const lowestScore = entries.filter(e => e.subject).length > 0
+    ? Math.min(...entries.filter(e => e.subject).map(e => {
+        const score = e.scaledScore || 0;
+        const lowerScore = e.subject ? getScaledScore(e.subject, e.lowerResult || '0', 0) : 0;
+        return Math.min(score, lowerScore);
+      }))
+    : 0;  // Default to 0 if no subjects
   const xAxisMin = Math.max(0, Math.floor((lowestScore - 10) / 10) * 10);  // Round down to nearest 10
 
   // Transform data for Recharts
@@ -67,8 +69,8 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
     const upperScore = entry.subject ? getScaledScore(entry.subject, entry.upperResult || '0', 0) : 0;
 
     // If all values are equal, add tiny offsets to create visual width
-    const adjustedLowerScore = (lowerScore === currentScore && currentScore === upperScore) ? lowerScore - 0.1 : lowerScore;
-    const adjustedUpperScore = (lowerScore === currentScore && currentScore === upperScore) ? upperScore + 0.1 : upperScore;
+    const adjustedLowerScore = (lowerScore === currentScore && currentScore === upperScore) ? lowerScore - 0.3 : lowerScore;
+    const adjustedUpperScore = (lowerScore === currentScore && currentScore === upperScore) ? upperScore + 0.3 : upperScore;
 
     // Shift all values relative to xAxisMin
     return {
@@ -98,7 +100,7 @@ export const ScaledScoreChart: React.FC<ScaledScoreChartProps> = ({ entries, ran
           data={chartData}
           layout="vertical"
           margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
-          barSize={50}
+          barSize={40}
         >
           <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} />
           <XAxis 
