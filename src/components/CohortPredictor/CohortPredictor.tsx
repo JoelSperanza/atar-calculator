@@ -44,7 +44,10 @@ export function CohortPredictor({ view, onDataLoaded }: CohortPredictorProps) {
   const [generalSubjects, setGeneralSubjects] = useState<GeneralSubject[]>([])
   const [appliedSubjects, setAppliedSubjects] = useState<AppliedSubject[]>([])
   const [studentScores, setStudentScores] = useState<Record<string, StudentScores[]>>({})
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'Student Name', direction: 'asc' })
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ 
+    key: 'Student Name',
+    direction: 'asc'
+  })
 
   useEffect(() => {
     // Load subject types
@@ -260,12 +263,10 @@ export function CohortPredictor({ view, onDataLoaded }: CohortPredictorProps) {
 
   const handleSort = (key: string) => {
     setSortConfig(current => {
-      // If clicking a different column or current direction is desc, set to ascending
-      if (current.key !== key || current.direction === 'desc') {
+      if (current.key !== key) {
         return { key, direction: 'asc' };
       }
-      // If clicking same column and current direction is asc, switch to descending
-      return { key, direction: 'desc' };
+      return { key, direction: current.direction === 'asc' ? 'desc' : 'asc' };
     });
   }
 
@@ -277,6 +278,149 @@ export function CohortPredictor({ view, onDataLoaded }: CohortPredictorProps) {
   const formatScore = (score: number | null) => 
     score === null ? "ATAR Ineligible" : score.toFixed(2);
 
+  const isAtarView = (v: CohortPredictorProps['view']): boolean => {
+    return v === 'atars' || v === 'ranged-atars';
+  };
+
+  const sortData = (data: any[]) => {
+    if (!sortConfig.key) return data;
+
+    // For ATAR views, first get unique students
+    if (isAtarView(view)) {
+      const uniqueStudents = Array.from(new Set(data.map(row => {
+        const keys = Object.keys(row);
+        return row[keys[0]];
+      }))).map(studentName => {
+        const firstRow = data.find(row => {
+          const keys = Object.keys(row);
+          return row[keys[0]] === studentName;
+        })!;
+        return firstRow;
+      });
+      
+      return uniqueStudents.sort((a, b) => {
+        const keys = Object.keys(a);
+        let aValue: any;
+        let bValue: any;
+
+        switch (sortConfig.key) {
+          case 'TE':
+            aValue = calculateTEScore(studentScores[a[keys[0]]] || [], false, false);
+            bValue = calculateTEScore(studentScores[b[keys[0]]] || [], false, false);
+            break;
+          case 'ATAR':
+            const teA = calculateTEScore(studentScores[a[keys[0]]] || [], false, false);
+            const teB = calculateTEScore(studentScores[b[keys[0]]] || [], false, false);
+            aValue = calculateATAR(teA);
+            bValue = calculateATAR(teB);
+            break;
+          default:
+            aValue = a[keys[0]]; // Student Name
+            bValue = b[keys[0]];
+        }
+
+        // Handle null values
+        if (aValue === null && bValue === null) return 0;
+        if (aValue === null) return 1;
+        if (bValue === null) return -1;
+
+        // Compare values
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    // For other views, use existing sort logic
+    return [...data].sort((a, b) => {
+      const keys = Object.keys(a);
+      let aValue: any;
+      let bValue: any;
+
+      // Primary sort by the selected column
+      switch (sortConfig.key) {
+        case 'Subject Type':
+          aValue = getSubjectType(a[keys[1]]);
+          bValue = getSubjectType(b[keys[1]]);
+          break;
+        case 'Scaled':
+          aValue = getScaledScore(a[keys[1]], a[keys[2]]);
+          bValue = getScaledScore(b[keys[1]], b[keys[2]]);
+          break;
+        case 'TE':
+          aValue = calculateTEScore(studentScores[a[keys[0]]] || [], false, false);
+          bValue = calculateTEScore(studentScores[b[keys[0]]] || [], false, false);
+          break;
+        case 'ATAR':
+          const teA = calculateTEScore(studentScores[a[keys[0]]] || [], false, false);
+          const teB = calculateTEScore(studentScores[b[keys[0]]] || [], false, false);
+          aValue = calculateATAR(teA);
+          bValue = calculateATAR(teB);
+          break;
+        case 'Result Range':
+          const boundsA = calculateBounds(Number(a[keys[2]]), getSubjectType(a[keys[1]]), a[keys[2]]);
+          const boundsB = calculateBounds(Number(b[keys[2]]), getSubjectType(b[keys[1]]), b[keys[2]]);
+          aValue = boundsA.lower;
+          bValue = boundsB.lower;
+          break;
+        case 'Scaled Range':
+          const boundsScaledA = calculateBounds(Number(a[keys[2]]), getSubjectType(a[keys[1]]), a[keys[2]]);
+          const boundsScaledB = calculateBounds(Number(b[keys[2]]), getSubjectType(b[keys[1]]), b[keys[2]]);
+          aValue = getScaledScore(a[keys[1]], boundsScaledA.lower.toString());
+          bValue = getScaledScore(b[keys[1]], boundsScaledB.lower.toString());
+          break;
+        case 'TE Range':
+          const teRangeA = calculateTEScore(studentScores[a[keys[0]]] || [], true, false);
+          const teRangeB = calculateTEScore(studentScores[b[keys[0]]] || [], true, false);
+          aValue = teRangeA;
+          bValue = teRangeB;
+          break;
+        case 'ATAR Range':
+          const teRangeAtarA = calculateTEScore(studentScores[a[keys[0]]] || [], true, false);
+          const teRangeAtarB = calculateTEScore(studentScores[b[keys[0]]] || [], true, false);
+          aValue = calculateATAR(teRangeAtarA);
+          bValue = calculateATAR(teRangeAtarB);
+          break;
+        default:
+          // For Student Name, Subject, and Result
+          aValue = a[keys[Object.keys(a).findIndex(k => k.toLowerCase().includes(sortConfig.key.toLowerCase()))]];
+          bValue = b[keys[Object.keys(b).findIndex(k => k.toLowerCase().includes(sortConfig.key.toLowerCase()))]];
+      }
+
+      // Handle null values
+      if (aValue === null && bValue === null) return 0;
+      if (aValue === null) return 1;
+      if (bValue === null) return -1;
+
+      // Compare values for primary sort
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+
+      // If primary values are equal and we're sorting by Student Name, apply secondary sort
+      if (sortConfig.key === 'Student Name') {
+        // Get scaled values for secondary sort
+        let aScaled: number;
+        let bScaled: number;
+
+        if (view === 'ranged-results' || view === 'ranged-atars') {
+          const boundsScaledA = calculateBounds(Number(a[keys[2]]), getSubjectType(a[keys[1]]), a[keys[2]]);
+          const boundsScaledB = calculateBounds(Number(b[keys[2]]), getSubjectType(b[keys[1]]), b[keys[2]]);
+          aScaled = getScaledScore(a[keys[1]], boundsScaledA.lower.toString());
+          bScaled = getScaledScore(b[keys[1]], boundsScaledB.lower.toString());
+        } else {
+          aScaled = getScaledScore(a[keys[1]], a[keys[2]]);
+          bScaled = getScaledScore(b[keys[1]], b[keys[2]]);
+        }
+
+        // Secondary sort in descending order
+        if (aScaled > bScaled) return -1;
+        if (aScaled < bScaled) return 1;
+      }
+
+      return 0;
+    });
+  };
+
   const renderTableHeaders = () => {
     if (!data.length) return null;
 
@@ -284,41 +428,41 @@ export function CohortPredictor({ view, onDataLoaded }: CohortPredictorProps) {
       case 'results':
         return (
           <tr>
-            <th onClick={() => handleSort('Student Name')}>Student Name {getSortIndicator('Student Name')}</th>
-            <th onClick={() => handleSort('Subject')}>Subject {getSortIndicator('Subject')}</th>
-            <th>Subject Type</th>
-            <th onClick={() => handleSort('Result')}>Result {getSortIndicator('Result')}</th>
-            <th>Scaled</th>
-            <th>TE</th>
-            <th>ATAR</th>
+            <th onClick={() => handleSort('Student Name')} className="sortable">Student Name {getSortIndicator('Student Name')}</th>
+            <th onClick={() => handleSort('Subject')} className="sortable">Subject {getSortIndicator('Subject')}</th>
+            <th onClick={() => handleSort('Subject Type')} className="sortable">Subject Type {getSortIndicator('Subject Type')}</th>
+            <th onClick={() => handleSort('Result')} className="sortable">Result {getSortIndicator('Result')}</th>
+            <th onClick={() => handleSort('Scaled')} className="sortable">Scaled {getSortIndicator('Scaled')}</th>
+            <th onClick={() => handleSort('TE')} className="sortable">TE {getSortIndicator('TE')}</th>
+            <th onClick={() => handleSort('ATAR')} className="sortable">ATAR {getSortIndicator('ATAR')}</th>
           </tr>
         );
       case 'atars':
         return (
           <tr>
-            <th onClick={() => handleSort('Student Name')}>Student Name {getSortIndicator('Student Name')}</th>
-            <th>TE</th>
-            <th>ATAR</th>
+            <th onClick={() => handleSort('Student Name')} className="sortable">Student Name {getSortIndicator('Student Name')}</th>
+            <th onClick={() => handleSort('TE')} className="sortable">TE {getSortIndicator('TE')}</th>
+            <th onClick={() => handleSort('ATAR')} className="sortable">ATAR {getSortIndicator('ATAR')}</th>
           </tr>
         );
       case 'ranged-results':
         return (
           <tr>
-            <th onClick={() => handleSort('Student Name')}>Student Name {getSortIndicator('Student Name')}</th>
-            <th onClick={() => handleSort('Subject')}>Subject {getSortIndicator('Subject')}</th>
-            <th>Subject Type</th>
-            <th>Result Range</th>
-            <th>Scaled Range</th>
-            <th>TE Range</th>
-            <th>ATAR Range</th>
+            <th onClick={() => handleSort('Student Name')} className="sortable">Student Name {getSortIndicator('Student Name')}</th>
+            <th onClick={() => handleSort('Subject')} className="sortable">Subject {getSortIndicator('Subject')}</th>
+            <th onClick={() => handleSort('Subject Type')} className="sortable">Subject Type {getSortIndicator('Subject Type')}</th>
+            <th onClick={() => handleSort('Result Range')} className="sortable">Result Range {getSortIndicator('Result Range')}</th>
+            <th onClick={() => handleSort('Scaled Range')} className="sortable">Scaled Range {getSortIndicator('Scaled Range')}</th>
+            <th onClick={() => handleSort('TE Range')} className="sortable">TE Range {getSortIndicator('TE Range')}</th>
+            <th onClick={() => handleSort('ATAR Range')} className="sortable">ATAR Range {getSortIndicator('ATAR Range')}</th>
           </tr>
         );
       case 'ranged-atars':
         return (
           <tr>
-            <th onClick={() => handleSort('Student Name')}>Student Name {getSortIndicator('Student Name')}</th>
-            <th>TE Range</th>
-            <th>ATAR Range</th>
+            <th onClick={() => handleSort('Student Name')} className="sortable">Student Name {getSortIndicator('Student Name')}</th>
+            <th onClick={() => handleSort('TE Range')} className="sortable">TE Range {getSortIndicator('TE Range')}</th>
+            <th onClick={() => handleSort('ATAR Range')} className="sortable">ATAR Range {getSortIndicator('ATAR Range')}</th>
           </tr>
         );
       default:
@@ -370,8 +514,6 @@ export function CohortPredictor({ view, onDataLoaded }: CohortPredictorProps) {
         );
 
       case 'atars':
-        // Only show each student once
-        if (data.findIndex(r => r[keys[0]] === studentName) !== i) return null;
         return (
           <tr key={i}>
             <td>{studentName}</td>
@@ -394,8 +536,6 @@ export function CohortPredictor({ view, onDataLoaded }: CohortPredictorProps) {
         );
 
       case 'ranged-atars':
-        // Only show each student once
-        if (data.findIndex(r => r[keys[0]] === studentName) !== i) return null;
         return (
           <tr key={i}>
             <td>{studentName}</td>
@@ -537,7 +677,7 @@ export function CohortPredictor({ view, onDataLoaded }: CohortPredictorProps) {
               {renderTableHeaders()}
             </thead>
             <tbody>
-              {data.map((row, i) => renderTableRow(row, i))}
+              {sortData(data).map((row, i) => renderTableRow(row, i))}
             </tbody>
           </table>
         )
