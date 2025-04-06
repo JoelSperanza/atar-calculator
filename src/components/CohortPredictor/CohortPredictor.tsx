@@ -409,40 +409,138 @@ export function CohortPredictor({ view, onDataLoaded }: CohortPredictorProps) {
     }
   }
 
+  const calculateSummaryStats = () => {
+    // Get unique students and their ATARs
+    const studentAtars = new Map();
+    Object.entries(studentScores).forEach(([studentName, scores]) => {
+      const te = calculateTEScore(scores, false, false);
+      const atar = calculateATAR(te);
+      if (atar !== null) {
+        studentAtars.set(studentName, atar);
+      }
+    });
+
+    // Calculate median ATAR
+    const atars = Array.from(studentAtars.values()).sort((a, b) => a - b);
+    const mid = Math.floor(atars.length / 2);
+    const medianAtar = atars.length % 2 === 0
+      ? ((atars[mid - 1] + atars[mid]) / 2).toFixed(2)
+      : atars[mid].toFixed(2);
+
+    // Calculate distribution
+    const distribution = [
+      { threshold: 99, count: 0 },
+      { threshold: 95, count: 0 },
+      { threshold: 90, count: 0 },
+      { threshold: 80, count: 0 },
+      { threshold: 70, count: 0 },
+      { threshold: 60, count: 0 },
+    ];
+
+    atars.forEach(atar => {
+      for (const entry of distribution) {
+        if (atar >= entry.threshold) {
+          entry.count++;
+        }
+      }
+    });
+
+    return {
+      eligibleCount: atars.length,
+      medianAtar,
+      distribution: distribution.map(entry => ({
+        threshold: entry.threshold,
+        count: entry.count,
+        percentage: ((entry.count / atars.length) * 100).toFixed(2)
+      }))
+    };
+  };
+
+  const renderSummaryView = () => {
+    if (!data.length) return null;
+    
+    const stats = calculateSummaryStats();
+    
+    return (
+      <div>
+        <div className="summary-stats">
+          <div className="stat-box">
+            <h3>ATAR Eligible Students</h3>
+            <div className="stat-value">{stats.eligibleCount}</div>
+          </div>
+          <div className="stat-box">
+            <h3>Median ATAR</h3>
+            <div className="stat-value">{stats.medianAtar}</div>
+          </div>
+        </div>
+        
+        <div className="atar-distribution">
+          <h2>ATAR Distribution</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ATAR greater than</th>
+                <th>No. of students</th>
+                <th>% of ATAR eligible students</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.distribution.map(entry => (
+                <tr key={entry.threshold}>
+                  <td>{entry.threshold}</td>
+                  <td>{entry.count}</td>
+                  <td>{entry.percentage}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
-      <div>
-        <label>
-          Variation: 
-          <input 
-            type="number" 
-            min={0} 
-            max={10} 
-            value={variation} 
-            onChange={(e) => {
-              const value = e.target.value
-              if (value === '') {
-                setVariation('')
-                return
-              }
-              const num = Number(value)
-              if (!isNaN(num)) {
-                setVariation(Math.min(10, Math.max(0, num)).toString())
-              }
-            }}
-          />
-        </label>
-      </div>
-      <input type="file" accept=".xlsx" onChange={handleFileUpload} />
-      {data.length > 0 && (
-        <table>
-          <thead>
-            {renderTableHeaders()}
-          </thead>
-          <tbody>
-            {data.map((row, i) => renderTableRow(row, i))}
-          </tbody>
-        </table>
+      {(view === 'ranged-results' || view === 'ranged-atars') && (
+        <div>
+          <label>
+            Variation: 
+            <input 
+              type="number" 
+              min={0} 
+              max={10} 
+              value={variation} 
+              onChange={(e) => {
+                const value = e.target.value
+                if (value === '') {
+                  setVariation('')
+                  return
+                }
+                const num = Number(value)
+                if (!isNaN(num)) {
+                  setVariation(Math.min(10, Math.max(0, num)).toString())
+                }
+              }}
+            />
+          </label>
+        </div>
+      )}
+      {view === 'upload' && (
+        <input type="file" accept=".xlsx" onChange={handleFileUpload} />
+      )}
+      {view === 'summary' ? (
+        renderSummaryView()
+      ) : (
+        data.length > 0 && (
+          <table>
+            <thead>
+              {renderTableHeaders()}
+            </thead>
+            <tbody>
+              {data.map((row, i) => renderTableRow(row, i))}
+            </tbody>
+          </table>
+        )
       )}
     </div>
   )
