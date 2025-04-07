@@ -76,5 +76,7 @@ export function calculateATAR(teScore: number): number {
   // Ensure ATAR is within valid bounds (30-99.95)
   if (atar < 30) return 30;
   if (atar > 99.95) return 99.95;
-  return atar;
+
+  // Round to nearest 0.05
+  return Math.round(atar * 20) / 20;
 } 

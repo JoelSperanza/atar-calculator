@@ -1,0 +1,133 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+  background-color: #f7fafc;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 24px;
+  transition: background-color 0.2s;
+}
+
+th.sortable:hover {
+  background-color: #edf2f7;
+}
+
+tr:hover {
+  background-color: #f7fafc;
+}
+
+td {
+  color: #2d3748;
+}
+
+.summary-stats {
+  display: flex;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.stat-box {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 200px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-box h3 {
+  color: #6c757d;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #4361ee;
+}
+
+.atar-distribution {
+  margin-top: 3rem;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.atar-distribution h2 {
+  color: #212529;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.atar-distribution table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.atar-distribution th {
+  padding: 12px 24px;
+  text-align: center;
+  min-width: 150px;
+}
+
+.atar-distribution td {
+  padding: 12px 24px;
+  text-align: center;
+  min-width: 150px;
+}
+
+.atar-distribution th:first-child,
+.atar-distribution td:first-child {
+  text-align: left;
+  min-width: 120px;
+}
+
+.atar-distribution {
+  padding: 0 1rem;
+}
+
+.search-container {
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.student-search {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background-color: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.student-search:focus {
+  outline: none;
+  border-color: #4361ee;
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+.student-search::placeholder {
+  color: #a0aec0;
+} 

@@ -1,0 +1,65 @@
+.scaled-score-chart {
+  width: 100%;
+  margin: 20px 0;
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scaled-score-chart h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+/* Override Recharts default styles */
+.scaled-score-chart .recharts-cartesian-grid-horizontal line,
+.scaled-score-chart .recharts-cartesian-grid-vertical line {
+  stroke: #eee;
+  stroke-dasharray: 3 3;
+}
+
+.scaled-score-chart .recharts-yAxis .recharts-text {
+  fill: #666;
+  font-size: 0.9em;
+}
+
+.scaled-score-chart .recharts-xAxis .recharts-text {
+  fill: #666;
+  font-size: 0.9em;
+}
+
+/* Custom tooltip styles */
+.chart-tooltip {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-tooltip p {
+  margin: 4px 0;
+  font-size: 0.9em;
+  color: #333;
+}
+
+.chart-tooltip .subject {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.chart-tooltip .lower {
+  color: #666;
+}
+
+.chart-tooltip .middle {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.chart-tooltip .upper {
+  color: #666;
+} 

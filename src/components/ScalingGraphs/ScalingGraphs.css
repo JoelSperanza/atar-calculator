@@ -1,0 +1,203 @@
+.scaling-graphs-container {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem;
+  width: 100%;
+  height: calc(100vh - 80px);
+  margin: 0;
+}
+
+.selection-grid {
+  flex: 0 0 500px;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.clear-all-button {
+  align-self: flex-start;
+  margin-bottom: 0.5rem;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  color: #666;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-all-button:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.selection-grid table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.selection-grid .table-container {
+  overflow: auto;
+  flex: 1;
+}
+
+.selection-grid thead {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 2;
+}
+
+.selection-grid th {
+  padding: 0.35rem 0.25rem;
+  text-align: center;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  background: white;
+}
+
+.year-header {
+  width: 40px;
+}
+
+.selection-grid td {
+  padding: 0.35rem 0.25rem;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.subject-name {
+  text-align: left !important;
+  font-weight: 500;
+  color: #333;
+  position: sticky;
+  left: 0;
+  background: white;
+  z-index: 1;
+  min-width: 250px;
+  padding-right: 1rem !important;
+}
+
+.selection-cell {
+  width: 40px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: center;
+}
+
+.selection-cell:hover {
+  background-color: #f5f5f5;
+}
+
+.selection-cell input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.header-checkbox,
+.row-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.header-checkbox {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.row-checkbox {
+  justify-content: flex-start;
+}
+
+.header-checkbox input[type="checkbox"],
+.row-checkbox input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.header-checkbox span {
+  font-size: 0.85rem;
+}
+
+.graph-container {
+  flex: 1;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  padding-right: 1rem;
+  margin: -0.5rem;
+}
+
+.checkbox-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.checkbox-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.checkbox-list::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+.checkbox-list::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.checkbox-label:hover {
+  background-color: #f5f5f5;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.checkbox-label span {
+  font-size: 0.95rem;
+  color: #444;
+} 

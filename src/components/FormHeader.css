@@ -1,0 +1,77 @@
+.form-header {
+  margin-bottom: 20px;
+}
+
+.form-controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.subject-count-label,
+.range-mode-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.subject-count-input {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.range-mode-toggle {
+  width: 20px;
+  height: 20px;
+}
+
+.quick-range-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-range-input {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.quick-range-button {
+  padding: 4px 12px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.quick-range-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.quick-range-button:not(:disabled):hover {
+  background-color: #357abd;
+}
+
+.loading-message,
+.error-message {
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.loading-message {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+} 
