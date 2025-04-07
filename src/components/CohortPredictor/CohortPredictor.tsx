@@ -40,6 +40,7 @@ interface CohortPredictorProps {
 export function CohortPredictor({ view, onDataLoaded }: CohortPredictorProps) {
   const [data, setData] = useState<any[]>([])
   const [variation, setVariation] = useState<string>('0')
+  const [searchTerm, setSearchTerm] = useState<string>('')
   const [subjectTypes, setSubjectTypes] = useState<SubjectTypeMap>({})
   const [generalSubjects, setGeneralSubjects] = useState<GeneralSubject[]>([])
   const [appliedSubjects, setAppliedSubjects] = useState<AppliedSubject[]>([])
@@ -639,8 +640,46 @@ export function CohortPredictor({ view, onDataLoaded }: CohortPredictorProps) {
     );
   };
 
+  // Get unique student names in alphabetical order
+  const getUniqueStudentNames = () => {
+    if (!data.length) return [];
+    const keys = Object.keys(data[0]);
+    return Array.from(new Set(data.map(row => row[keys[0]])))
+      .sort((a, b) => a.localeCompare(b));
+  };
+
+  // Filter data based on search term
+  const filterData = (dataToFilter: any[]) => {
+    if (!searchTerm) return dataToFilter;
+    
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    const keys = Object.keys(dataToFilter[0]);
+    
+    return dataToFilter.filter(row => {
+      const studentName = row[keys[0]].toLowerCase();
+      return studentName.includes(lowerSearchTerm);
+    });
+  };
+
   return (
     <div>
+      {view !== 'upload' && view !== 'summary' && (
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search students..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="student-search"
+            list="student-names"
+          />
+          <datalist id="student-names">
+            {getUniqueStudentNames().map(name => (
+              <option key={name} value={name} />
+            ))}
+          </datalist>
+        </div>
+      )}
       {(view === 'ranged-results' || view === 'ranged-atars') && (
         <div>
           <label>
@@ -677,7 +716,7 @@ export function CohortPredictor({ view, onDataLoaded }: CohortPredictorProps) {
               {renderTableHeaders()}
             </thead>
             <tbody>
-              {sortData(data).map((row, i) => renderTableRow(row, i))}
+              {sortData(filterData(data)).map((row, i) => renderTableRow(row, i))}
             </tbody>
           </table>
         )
